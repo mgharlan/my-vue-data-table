@@ -3,12 +3,12 @@
     <table>
       <thead>
         <tr>
-          <th v-for="column in columns" :key="column.dataKey">
+          <th v-on:click="sort(column)" v-for="column in columns" :key="column.dataKey">
             <div class="flex-row" :style="`align-items: center; justify-content: ${column.align}`">
               <div style=" margin-right: 4px;">{{ column.name }}</div>
               <div class="flex-column">
-                <small class="text-xs">&#9650;</small>
-                <small class="text-xs">&#9660;</small>
+                <small :class="`text-xs ${(sortColumn == column.dataKey && sortOrder == 'asc') ? '' : 'inactive'}`">&#9650;</small>
+                <small :class="`text-xs ${(sortColumn == column.dataKey && sortOrder == 'desc')? '' : 'inactive'}`">&#9660;</small>
               </div> 
             </div>
           </th>
@@ -50,6 +50,8 @@ export default {
     return {
       page: 0,
       pageOffset: 0,
+      sortColumn: '',
+      sortOrder: '',
     }
   },
   computed: {
@@ -92,7 +94,38 @@ export default {
       else{
         return this.perPage;
       }
-    }
+    },
+    sort(column){
+      if(this.sortColumn === column.dataKey){
+        if(this.sortOrder === 'asc'){
+          this.sortOrder = 'desc';
+          this.rows.reverse();
+        }
+        else if(this.sortOrder === 'desc'){
+          this.sortOrder = 'asc';
+          this.rows.sort(this.compare(column));
+        } 
+      }
+      else{
+        this.sortColumn = column.dataKey;
+        this.sortOrder = 'asc';
+        this.rows.sort(this.compare(column));
+      }
+    },
+    compare(column){
+      let key = column.dataKey;
+      return (a,b)=>{
+        let val1 = (column.formatValue === undefined) ? a[key] : column.formatValue(a[key]);
+        let val2 = (column.formatValue === undefined) ? b[key] : column.formatValue(b[key]);
+        if (val1 < val2) {
+          return -1;
+        }
+        if (val1 > val2) {
+          return 1;
+        }
+        return 0;
+      }
+    }, 
   }
 }
 </script>
@@ -115,6 +148,7 @@ export default {
     padding: 8px;
     color: #748c9d;
     border: none;
+    cursor: pointer;
   }
 
   td{
@@ -199,5 +233,9 @@ export default {
 
   .text-xs{
     font-size: 8px;
+  }
+
+  .inactive{
+    color: #d9dee2;
   }
 </style>
