@@ -7,8 +7,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="index in getNumOnPage()" :key="getTrueIndex(index)" :class="(getTrueIndex(index)%2 == 0) ? 'striped' : ''">
-          <td v-for="column in columns" :key="getTrueIndex(index) + '-' + column.dataKey">{{ formatValue(column, index) }}</td>
+        <tr v-for="index in getNumOnPage()" :key="getTrueIndex(index)" :class="(index%2 == 0) ? '' : 'striped'">
+          <td v-for="column in columns" :key="getTrueIndex(index) + '-' + column.dataKey" :style="`text-align: ${column.align};`">{{ formatValue(column, index) }}</td>
         </tr>
       </tbody> 
     </table> 
@@ -16,7 +16,7 @@
       <div class="flex-row">
         <div :class="['page-back', ((this.page > 0) ? '' : 'disabled')]" v-on:click="pageBack()">&laquo;</div>
         <div v-if="pages === 0" class="page-num active"><small>1</small></div>
-        <div v-else v-for="pageIndex in pages" :key="pageIndex" :class="`page-num ${(pageIndex-1 == page) ? 'active' : ''}`" v-on:click="pageNum(pageIndex)"><small>{{pageIndex}}</small></div>
+        <div v-else v-for="pageIndex in (pages > 10) ? 10 : pages" :key="pageIndex + pageOffset * 10" :class="`page-num ${(pageIndex + pageOffset * 10 - 1 == page) ? 'active' : ''}`" v-on:click="pageNum(pageIndex + pageOffset * 10)"><small>{{pageIndex + pageOffset * 10}}</small></div>
         <div :class="['page-forward', ((this.page < this.pages-1) ? '' : 'disabled')]" v-on:click="pageForward()">&raquo;</div>
       </div>
       <div class="page-info">
@@ -39,6 +39,7 @@ export default {
   data() {
     return {
       page: 0,
+      pageOffset: 0,
     }
   },
   computed: {
@@ -57,11 +58,17 @@ export default {
     pageForward(){
       if(this.page < this.pages-1){
         this.page++;
+        if(this.page%10 === 0){
+          this.pageOffset++;
+        }
       }
     },
-    pageBack(){
+    pageBack(){ 
       if(this.page > 0){
-        this.page--;
+        if(this.page%10 === 0){
+          this.pageOffset--;
+        }
+        this.page--;  
       }
     },
     pageNum(page){
@@ -124,35 +131,38 @@ export default {
     border: solid #d9dee2 1px;
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
-    padding-left: 4px;
-    padding-right: 4px;
-    padding-top: 2px;
-    padding-bottom: 2px;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 3px;
+    padding-bottom: 3px;
     cursor: pointer;
   }
 
 .page-forward{
     color: black;
     background: white;
-    border: solid #d9dee2 1px;
+    border-top: solid #d9dee2 1px;
+    border-right: solid #d9dee2 1px;
+    border-bottom: solid #d9dee2 1px;
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
-    padding-left: 4px;
-    padding-right: 4px;
-    padding-top: 2px;
-    padding-bottom: 2px;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 3px;
+    padding-bottom: 3px;
     cursor: pointer;
   }
 
   .page-num{
     color: black;
     background: white;
-    border-bottom: solid #d9dee2 1px;
     border-top: solid #d9dee2 1px;
-    padding-left: 4px;
-    padding-right: 4px;
-    padding-top: 2px;
-    padding-bottom: 2px;
+    border-bottom: solid #d9dee2 1px;
+    border-right: solid #d9dee2 1px;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 3px;
+    padding-bottom: 3px;
     cursor: pointer;
   }
 

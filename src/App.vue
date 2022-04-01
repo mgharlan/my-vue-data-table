@@ -17,6 +17,8 @@
   <br>
   <h2>Testing Larger Result Set</h2>
   <v-data-table :columns="biggerColumns" :rows="biggerData" :per-page="10" />
+  <br>
+  <v-data-table :columns="biggerColumns" :rows="biggerData" :per-page="5" />
 </template>
 
 <script>
