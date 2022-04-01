@@ -3,7 +3,15 @@
     <table>
       <thead>
         <tr>
-          <th v-for="column in columns" :key="column.dataKey" :style="`text-align: ${column.align};`">{{ column.name }}</th>
+          <th v-for="column in columns" :key="column.dataKey">
+            <div class="flex-row" :style="`align-items: center; justify-content: ${column.align}`">
+              <div style=" margin-right: 4px;">{{ column.name }}</div>
+              <div class="flex-column">
+                <small class="text-xs">&#9650;</small>
+                <small class="text-xs">&#9660;</small>
+              </div> 
+            </div>
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -16,7 +24,9 @@
       <div class="flex-row">
         <div :class="['page-back', ((this.page > 0) ? '' : 'disabled')]" v-on:click="pageBack()">&laquo;</div>
         <div v-if="pages === 0" class="page-num active"><small>1</small></div>
-        <div v-else v-for="pageIndex in (pages > 10) ? 10 : pages" :key="pageIndex + pageOffset * 10" :class="`page-num ${(pageIndex + pageOffset * 10 - 1 == page) ? 'active' : ''}`" v-on:click="pageNum(pageIndex + pageOffset * 10)"><small>{{pageIndex + pageOffset * 10}}</small></div>
+        <div v-else v-for="pageIndex in (pages > 10) ? 10 : pages" :key="pageIndex + pageOffset * 10" :class="`page-num ${(pageIndex + pageOffset * 10 - 1 == page) ? 'active' : ''}`" v-on:click="pageNum(pageIndex + pageOffset * 10)">
+          <small>{{pageIndex + pageOffset * 10}}</small>
+        </div>
         <div :class="['page-forward', ((this.page < this.pages-1) ? '' : 'disabled')]" v-on:click="pageForward()">&raquo;</div>
       </div>
       <div class="page-info">
@@ -125,6 +135,11 @@ export default {
     flex-direction: row;
   }
 
+  .flex-column{
+    display: flex;
+    flex-direction: column;
+  }
+
   .page-back{
     color: black;
     background: white;
@@ -180,5 +195,9 @@ export default {
 
   .striped{
     background: #e6ecec;
+  }
+
+  .text-xs{
+    font-size: 8px;
   }
 </style>
