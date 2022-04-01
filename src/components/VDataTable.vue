@@ -109,6 +109,7 @@ export default {
       if(this.sortColumn === column.dataKey){
         if(this.sortOrder === 'asc'){
           this.sortOrder = 'desc';
+          //could implement a different compare for descending - causes some interesting results when all values are the same
           this.rows.reverse();
         }
         else if(this.sortOrder === 'desc'){
