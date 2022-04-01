@@ -1,32 +1,32 @@
 <template>
-  <table>
-    <thead>
-      <tr>
-        <th v-for="column in columns" :key="column.dataKey" :style="`text-align: ${column.align};`">{{ column.name }}</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="index in perPage" :key="getTrueIndex(index)" :class="(getTrueIndex(index)%2 == 0) ? 'striped' : ''">
-        <td v-for="(value, key) in rows[getTrueIndex(index)]" :key="key + '-' + getTrueIndex(index)">{{ formatValue(key, value) }}</td>
-      </tr>
-    </tbody>
-    <tfoot>
-      <tr>
-        <td :colspan="columns.length">
-          <div class="page-back" v-on:click="pageBack()">&laquo;</div>
-          <div :class="`page-num ${(pageIndex-1 == page) ? 'active' : ''}`" v-for="pageIndex in pages" :key="pageIndex" v-on:click="pageNum(pageIndex)"><small>{{pageIndex}}</small></div>
-          <div class="page-forward" v-on:click="pageForward()">&raquo;</div>
-          <div class="page-info">
-            <small>{{pages}} pages ({{rows.length}} results)</small>
-          </div>
-        </td>
-      </tr>
-    </tfoot>
-  </table> 
+  <div class="table">
+    <table>
+      <thead>
+        <tr>
+          <th v-for="column in columns" :key="column.dataKey" :style="`text-align: ${column.align};`">{{ column.name }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="index in getNumOnPage()" :key="getTrueIndex(index)" :class="(getTrueIndex(index)%2 == 0) ? 'striped' : ''">
+          <td v-for="column in columns" :key="getTrueIndex(index) + '-' + column.dataKey">{{ formatValue(column, index) }}</td>
+        </tr>
+      </tbody> 
+    </table> 
+    <div class="flex-row footer">
+      <div class="flex-row">
+        <div :class="['page-back', ((this.page > 0) ? '' : 'disabled')]" v-on:click="pageBack()">&laquo;</div>
+        <div v-if="pages === 0" class="page-num active"><small>1</small></div>
+        <div v-else v-for="pageIndex in pages" :key="pageIndex" :class="`page-num ${(pageIndex-1 == page) ? 'active' : ''}`" v-on:click="pageNum(pageIndex)"><small>{{pageIndex}}</small></div>
+        <div :class="['page-forward', ((this.page < this.pages-1) ? '' : 'disabled')]" v-on:click="pageForward()">&raquo;</div>
+      </div>
+      <div class="page-info">
+        <small>{{pages}} pages ({{rows.length}} results)</small>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
-
 export default {
   props: {
     columns: Array,
@@ -43,13 +43,13 @@ export default {
   },
   computed: {
     pages(){
-      return Math.ceil(this.rows.length/this.perPage);
+      return (this.perPage === 0) ? 0 : Math.ceil(this.rows.length/this.perPage);
     }
   },
   methods: {
-    formatValue (key, value) {
-      let column = this.columns.find(column => column.dataKey === key)
-      return (column.formatValue !== undefined) ? column.formatValue(value) : value;
+    formatValue (column, index) {
+      let trueIndex = this.getTrueIndex(index);
+      return (column.formatValue !== undefined) ? column.formatValue(this.rows[trueIndex][column.dataKey]) : this.rows[trueIndex][column.dataKey];
     },
     getTrueIndex(index){
       return this.page * this.perPage + index - 1;
@@ -63,10 +63,18 @@ export default {
       if(this.page > 0){
         this.page--;
       }
-
     },
     pageNum(page){
       this.page = page - 1;
+    },
+    getNumOnPage(){
+      let numRowsLeft = this.rows.length - this.perPage * (this.page);
+      if(numRowsLeft < this.perPage){
+        return numRowsLeft;
+      }
+      else{
+        return this.perPage;
+      }
     }
   }
 }
@@ -74,13 +82,17 @@ export default {
 
 
 <style scoped>
+  .table{
+    font-family:Arial, Helvetica, sans-serif;
+    background: #f6f7f9;
+    margin: 8px;
+  } 
+
   table{
     width: 100%;
-    font-family:Arial, Helvetica, sans-serif;
     padding: 16px;
-    background: #f6f7f9;
     border-spacing: 0px;
-  } 
+  }
 
   th{
     padding: 8px;
@@ -94,8 +106,14 @@ export default {
     border: none;
   }
 
-  tfoot tr td{
-    padding-top: 16px;
+  .footer{
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-bottom: 16px;
+    color: #8797ac;
+  }
+  
+  .flex-row{
     display: flex;
     flex-direction: row;
   }
@@ -144,6 +162,10 @@ export default {
 
   .page-info{
     margin-left: 16px;
+  }
+
+  .disabled{
+    cursor: default;
   }
 
   .striped{
