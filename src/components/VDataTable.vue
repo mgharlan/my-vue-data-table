@@ -38,6 +38,7 @@
 
 <script>
 export default {
+  //parameters that specify the data for columns/rows and the number of results per page
   props: {
     columns: Array,
     rows: Array,
@@ -46,6 +47,7 @@ export default {
       default: 10,
     } 
   },
+  //data for keeping track of page number and sorting
   data() {
     return {
       page: 0,
@@ -55,18 +57,22 @@ export default {
     }
   },
   computed: {
+    //helper to get the number of pages from the number of results and page size
     pages(){
       return (this.perPage === 0) ? 0 : Math.ceil(this.rows.length/this.perPage);
     }
   },
   methods: {
+    //helper function to get the formatted value of a row
     formatValue (column, index) {
       let trueIndex = this.getTrueIndex(index);
       return (column.formatValue !== undefined) ? column.formatValue(this.rows[trueIndex][column.dataKey]) : this.rows[trueIndex][column.dataKey];
     },
+    //get the un-paginated index of a row
     getTrueIndex(index){
       return this.page * this.perPage + index - 1;
     },
+    //advance the pagination one page
     pageForward(){
       if(this.page < this.pages-1){
         this.page++;
@@ -75,6 +81,7 @@ export default {
         }
       }
     },
+    //go back a page
     pageBack(){ 
       if(this.page > 0){
         if(this.page%10 === 0){
@@ -83,9 +90,11 @@ export default {
         this.page--;  
       }
     },
+    //jump to a specified page
     pageNum(page){
       this.page = page - 1;
     },
+    //get the number of results to be displayed on a page
     getNumOnPage(){
       let numRowsLeft = this.rows.length - this.perPage * (this.page);
       if(numRowsLeft < this.perPage){
@@ -95,6 +104,7 @@ export default {
         return this.perPage;
       }
     },
+    //sort on a column (toggle between ascending and descending order)
     sort(column){
       if(this.sortColumn === column.dataKey){
         if(this.sortOrder === 'asc'){
@@ -112,6 +122,7 @@ export default {
         this.rows.sort(this.compare(column));
       }
     },
+    //the compare function used for sorting - can easily be swapped out for more specific or better impementations
     compare(column){
       let key = column.dataKey;
       return (a,b)=>{
@@ -129,7 +140,6 @@ export default {
   }
 }
 </script>
-
 
 <style scoped>
   .table{
