@@ -100,8 +100,8 @@
             name: "Sale",
             align: "right",
             formatValue(value) {
-              return "£" + value;
-            }
+              return '£' + value.toLocaleString("en-GB");
+            },
           },
         ],
         biggerData: this.getBiggerData(),
